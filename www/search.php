@@ -7,23 +7,22 @@
         header("Location: index.php");
         exit();
     }
-    $query = "SELECT * FROM lot_comics WHERE 1=1";
-    $query2 = "SELECT * FROM comics WHERE 1=1";
+    $query = "SELECT c.*, s.nom_serie, s.nb_tome, s.nb_hs 
+          FROM comics c 
+          LEFT JOIN serie s ON c.id_serie = s.id_serie 
+          WHERE 1=1";
     $param = [];
     if(isset($_POST['sub'])){
         if(!empty($_POST['titre'])){
-            $query .=" AND titre_lot LIKE :titre";
-            $query2 .=" AND titre_fr LIKE :titre";
+            $query .=" AND c.titre LIKE :titre";
             $param[':titre'] = "%".$_POST['titre']."%";
         }
         if(!empty($_POST['serie'])){
-            $query = $query." AND serie_lot LIKE :serie";
-            $query2 .=" AND serie_com LIKE :serie";
+            $query = $query." AND s.nom_serie LIKE :serie";
             $param[':serie'] = "%".$_POST['serie']."%";
         }
         if (!empty($_POST['annee'])) {
-            $query .= " AND strftime('%Y', date_lot) = :annee";
-            $query2 .= " AND strftime('%Y', date) = :annee";
+            $query .= " AND strftime('%Y', c.date) = :annee";
             $param[':annee'] = $_POST['annee'];
         }
         if (!empty($_POST['mois'])) {
@@ -33,15 +32,13 @@
                 'Septembre'=>'09', 'Octobre'=>'10', 'Novembre'=>'11', 'Décembre'=>'12'
             ];
             $num_mois = $mois_map[$_POST['mois']];
-            $query .= " AND strftime('%m', date_lot) = :mois";
-            $query2 .= " AND strftime('%m', date) = :mois";
+            $query .= " AND strftime('%m', c.date) = :mois";
             $param[':mois'] = $num_mois;
         }
 
         if (!empty($_POST['jour'])) {
             $jour = sprintf("%02d", $_POST['jour']);
-            $query .= " AND strftime('%d', date_lot) = :jour";
-            $query2 .= " AND strftime('%d', date) = :jour";
+            $query .= " AND strftime('%d', c.date) = :jour";
             $param[':jour'] = $jour;
         }
     }
@@ -93,17 +90,6 @@
                     <label class="form-label fw-bold">Serie :</label>
                     <input type="text" class="form-control" name="serie" placeholder="Ex: Venom">
                 </div>
-                <?php
-                /*<div class="col-md-6">
-                    <label class="form-label fw-bold">Auteur :</label>
-                    <input type="text" class="form-control" name="auteur">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-bold">Type :</label>
-                    <input type="text" class="form-control" name="Type">
-                </div>*/
-                ?>
-
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Jour :</label>
                     <input type="number" class="form-control" name="jour" min="1" max="31">
@@ -152,13 +138,11 @@
                         <th>Serie</th>
                         <th>Tome</th>
                         <th>Date</th>
-                        <th class="text-center">Lot</th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php
-                    getTableLot($query,$param);
-                    getTableComic($query2,$param);
+                    getTableComic($query,$param);
                 ?>
                 </tbody>
             </table>

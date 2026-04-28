@@ -18,53 +18,29 @@ function connectDB(){
 
 function initDB(){
   global $pdo;
+  $createSerieTable = "CREATE TABLE IF NOT EXISTS serie (
+      id_serie INTEGER PRIMARY KEY AUTOINCREMENT,
+      nom_serie VARCHAR(200) UNIQUE,
+      nb_tome INTEGER,
+      nb_hs INTEGER
+  );";
 
-    // Table COMICS
-    $createComicsTable = "CREATE TABLE IF NOT EXISTS comics (
-        id_comics INTEGER PRIMARY KEY AUTOINCREMENT,
-        titre_fr VARCHAR(200),
-        titre_en VARCHAR(200),
-        serie_com VARCHAR(100),
-        tome_com INTEGER,
-        possede INTEGER,
-        date DATE
-    );";
-
-    // Table LOT_COMICS
-    $createLotComicsTable = "CREATE TABLE IF NOT EXISTS lot_comics (
-        id_lot INTEGER PRIMARY KEY AUTOINCREMENT,
-        titre_lot VARCHAR(200),
-        titre_en_lot VARCHAR(200),
-        serie_lot VARCHAR(100),
-        tome_lot VARCHAR(50),
-        possede_lot INTEGER,
-        date_lot DATE,
-        image VARCHAR(200) DEFAULT '/images/default.png'
-    );";
-
-    // Table COMPOSITION_LOT (Clé primaire composée)
-    $createCompositionLotTable = "CREATE TABLE IF NOT EXISTS composition_lot (
-        id_lot INTEGER,
-        id_comics INTEGER,
-        PRIMARY KEY (id_lot, id_comics),
-        FOREIGN KEY (id_lot) REFERENCES lot_comics(id_lot) ON DELETE CASCADE,
-        FOREIGN KEY (id_comics) REFERENCES comics(id_comics) ON DELETE CASCADE
-    );";
-
-    $createGroupeTable = "CREATE TABLE IF NOT EXISTS groupe (
-        id_serie INTEGER PRIMARY KEY AUTOINCREMENT,
-        serie VARCHAR(200),
-        nb_tome INTEGER,
-        nb_hs INTEGER
-    );";
+  // Table COMICS
+  $createComicsTable = "CREATE TABLE IF NOT EXISTS comics (
+      id_comics INTEGER PRIMARY KEY AUTOINCREMENT,
+      titre VARCHAR(200),
+      id_serie INTEGER,
+      tome INTEGER,
+      date DATE,
+      picture VARCHAR(500),
+      FOREIGN KEY (id_serie) REFERENCES serie(id_serie) ON DELETE CASCADE
+  );";
 
   try {
     $pdo->exec($createComicsTable);
-    $pdo->exec($createLotComicsTable);
-    $pdo->exec($createCompositionLotTable);
-    $pdo->exec($createGroupeTable);
+    $pdo->exec($createSerieTable);
   } catch (PDOException $e) {
-    die("Erreur : " . $e->getMessage());
+    die("Erreur init : " . $e->getMessage());
   }
   
 }
