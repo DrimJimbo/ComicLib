@@ -69,36 +69,38 @@ function downloadPic($pic,$lot){
 function getTableLot($query,$param){
     global $pdo;
     $request = $pdo->prepare($query);
-        try {
-            $request->execute($param);
-            $all = $request->fetchAll();
+    try {
+        $request->execute($param);
+        $all = $request->fetchAll();
+        
+        foreach($all as $row) {
+            $image = htmlspecialchars($row['image']);
+            $titre = htmlspecialchars($row['titre_lot']);
+            $serie = htmlspecialchars($row['serie_lot']);
+            $date = htmlspecialchars($row['date_lot']);
+            $tome = htmlspecialchars($row['tome_com']);
+            // On utilise un badge Bootstrap pour le "Yes"
+            $lotBadge = '<span class="badge bg-success">Oui</span>';
             
-            foreach($all as $row) {
-                $image = htmlspecialchars($row['image']);
-                $titre = htmlspecialchars($row['titre_lot']);
-                $serie = htmlspecialchars($row['serie_lot']);
-                $date = htmlspecialchars($row['date_lot']);
-                // On utilise un badge Bootstrap pour le "Yes"
-                $lotBadge = '<span class="badge bg-success">Oui</span>';
-                
-                echo "<tr>";
-                echo '<td class="text-center"><span class="text-primary" 
-                style="cursor:pointer;" 
-                data-bs-toggle="popover" 
-                data-bs-trigger="hover focus" 
-                data-bs-html="true" 
-                data-bs-content="<img src=\''.$image.'\' class=\'img-fluid rounded\'>">
-                <i class="bi bi-image"></i> 
-                </span></td>';
-                echo "<td>$titre</td>";
-                echo "<td>$serie</td>";
-                echo "<td>$date</td>";
-                echo "<td class='text-center'>$lotBadge</td>";
-                echo "</tr>";
-            }
-        } catch (PDOException $e) {
-            echo "<tr><td colspan='3' class='text-danger text-center'>Erreur : " . $e->getMessage() . "</td></tr>";
+            echo "<tr>";
+            echo '<td class="text-center"><span class="text-primary" 
+            style="cursor:pointer;" 
+            data-bs-toggle="popover" 
+            data-bs-trigger="hover focus" 
+            data-bs-html="true" 
+            data-bs-content="<img src=\''.$image.'\' class=\'img-fluid rounded\'>">
+            <i class="bi bi-image"></i> 
+            </span></td>';
+            echo "<td>$titre</td>";
+            echo "<td>$serie</td>";
+            echo "<td>$tome</td>";
+            echo "<td>$date</td>";
+            echo "<td class='text-center'>$lotBadge</td>";
+            echo "</tr>";
         }
+    } catch (PDOException $e) {
+        echo "<tr><td colspan='3' class='text-danger text-center'>Erreur : " . $e->getMessage() . "</td></tr>";
+    }
 }
 function getTableComic($query,$param){
     global $pdo;
